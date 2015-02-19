@@ -19,9 +19,13 @@
 
 namespace NUClear {
     namespace threading {
-        
-        TaskScheduler::TaskScheduler() : shutdown_(false) {
-        }
+
+        TaskScheduler::TaskScheduler()
+        : shutdown_(false)
+        , queue([] (const std::unique_ptr<ReactionTask>& a, const std::unique_ptr<ReactionTask>& b) {
+            return a->parent->options.priority < b->parent->options.priority;
+        }) {}
+
         
         TaskScheduler::~TaskScheduler() {
         }
