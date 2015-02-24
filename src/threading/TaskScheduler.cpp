@@ -23,13 +23,13 @@ namespace NUClear {
         TaskScheduler::TaskScheduler()
         : shutdown_(false)
         , queue([] (const std::unique_ptr<ReactionTask>& a, const std::unique_ptr<ReactionTask>& b) {
-            return a->parent->options.priority < b->parent->options.priority;
+            return a->parent->options.priority > b->parent->options.priority;
         }) {}
 
-        
+
         TaskScheduler::~TaskScheduler() {
         }
-        
+
         void TaskScheduler::shutdown() {
             {
                 std::lock_guard<std::mutex> lock(mutex);
@@ -37,25 +37,25 @@ namespace NUClear {
             }
             condition.notify_all();
         }
-        
+
         void TaskScheduler::submit(std::unique_ptr<ReactionTask>&& task) {
             {
                 // We do not accept new tasks once we are shutdown or if this is a Single reaction that is already in the system
                 if(!shutdown_ && (!task->parent->options.single || !task->parent->running)) {
-                    
+
                     // We are now running
                     task->parent->running = true;
-                    
+
                     // If we are a sync type
                     if(task->parent->options.syncQueue) {
-                        
+
                         auto& syncQueue = task->parent->options.syncQueue->queue;
                         auto& syncMutex = task->parent->options.syncQueue->mutex;
                         auto& active = task->parent->options.syncQueue->active;
-                        
+
                         // Lock access to our syncQueue
                         std::lock_guard<std::mutex> lock(syncMutex);
-                        
+
                         // If a sync type is already executing then push it onto the sync queue
                         if (active) {
                             syncQueue.push(std::forward<std::unique_ptr<ReactionTask>>(task));
@@ -74,21 +74,21 @@ namespace NUClear {
                     }
                 }
             }
-            
+
             // Notify a thread that it can proceed
             condition.notify_one();
         }
-        
+
         std::unique_ptr<ReactionTask> TaskScheduler::getTask() {
-            
+
             //Obtain the lock
             std::unique_lock<std::mutex> lock(mutex);
-            
+
             // How this works in practice is that it will not shut down a thread until all tasks are drained
             while (true) {
                 // If there is nothing in the queue
                 if (queue.empty()) {
-                    
+
                     // And we are shutting down then terminate the requesting thread and tell all other threads to wake up
                     if(shutdown_) {
                         condition.notify_all();
@@ -104,11 +104,11 @@ namespace NUClear {
                     // If you're wondering why all the ridiculousness, it's because priority queue is not as feature complete as it should be
                     std::unique_ptr<ReactionTask> task(std::move(const_cast<std::unique_ptr<ReactionTask>&>(queue.top())));
                     queue.pop();
-                    
+
                     return std::move(task);
                 }
             }
-            
+
         }
     }
 }
