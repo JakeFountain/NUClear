@@ -56,7 +56,7 @@ namespace NUClear {
             volatile bool active;
             
             /// @brief a mutex to protect access to the queue
-            std::mutex mutex;
+            std::recursive_mutex mutex;
             
             /// @brief a priority queue that stores overflow tasks
             std::priority_queue<std::unique_ptr<ReactionTask>> queue;

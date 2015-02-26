@@ -60,7 +60,7 @@ namespace NUClear {
                         auto& syncMutex = task->parent->options.syncQueue->mutex;
                         
                         // Lock our sync types mutex
-                        std::lock_guard<std::mutex> lock(syncMutex);
+                        std::lock_guard<std::recursive_mutex> lock(syncMutex);
                         
                         active = false;
                         

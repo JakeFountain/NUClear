@@ -54,7 +54,7 @@ namespace NUClear {
                         auto& active = task->parent->options.syncQueue->active;
 
                         // Lock access to our syncQueue
-                        std::lock_guard<std::mutex> lock(syncMutex);
+                        std::lock_guard<std::recursive_mutex> lock(syncMutex);
 
                         // If a sync type is already executing then push it onto the sync queue
                         if (active) {
