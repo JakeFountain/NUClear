@@ -108,7 +108,7 @@ namespace NUClear {
              * @return the task which has been given to be executed
              */
             std::unique_ptr<ReactionTask> getTask();
-        private:
+        public:
             /// @brief if the scheduler is running or is shut down
             volatile bool shutdown_;
             /// @brief our queue which sorts tasks by priority

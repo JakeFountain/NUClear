@@ -47,16 +47,13 @@ namespace NUClear {
              *
              * @param type the type that this sync queue is managing.
              */
-            SyncQueue(const std::type_index type) : type(type), active(false) {}
-            
-            /// @brief the type that this sync queue is managing
-            const std::type_index type;
+            SyncQueue() : active(false) {}
             
             /// @brief if a task from this queue is currently in the main queue
             volatile bool active;
             
             /// @brief a mutex to protect access to the queue
-            std::recursive_mutex mutex;
+            std::mutex mutex;
             
             /// @brief a priority queue that stores overflow tasks
             std::priority_queue<std::unique_ptr<ReactionTask>> queue;
@@ -76,7 +73,7 @@ namespace NUClear {
         
         // Build a queue for each type we use
         template <typename QueueFor>
-        std::shared_ptr<SyncQueue> SyncQueueFor<QueueFor>::queue(std::make_shared<SyncQueue>(typeid(QueueFor)));
+        std::shared_ptr<SyncQueue> SyncQueueFor<QueueFor>::queue(std::make_shared<SyncQueue>());
     }
 }
 #endif
