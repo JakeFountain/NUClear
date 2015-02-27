@@ -64,17 +64,20 @@ namespace NUClear {
                         active = true;
                         std::lock_guard<std::mutex> lock(mutex);
                         queue.push(std::forward<std::unique_ptr<ReactionTask>>(task));
+                        
+                        // Notify a thread that it can proceed
+                        condition.notify_one();
                     }
                 }
                 // Otherwise move it onto the main queue
                 else {
                     std::lock_guard<std::mutex> lock(mutex);
                     queue.push(std::forward<std::unique_ptr<ReactionTask>>(task));
+                    
+                    // Notify a thread that it can proceed
+                    condition.notify_one();
                 }
             }
-
-            // Notify a thread that it can proceed
-            condition.notify_one();
         }
 
         std::unique_ptr<ReactionTask> TaskScheduler::getTask() {

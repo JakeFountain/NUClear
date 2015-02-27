@@ -71,6 +71,9 @@ namespace NUClear {
                             // Lock the main mutex and insert our task
                             std::lock_guard<std::mutex> mainLock(scheduler.mutex);
                             scheduler.queue.push(std::move(syncTask));
+                            
+                            // Notify a thread that it can proceed
+                            scheduler.condition.notify_one();
                         }
                         else {
                             active = false;
