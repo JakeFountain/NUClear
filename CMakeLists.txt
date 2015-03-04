@@ -17,7 +17,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/src/include)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/src)
 
 # Common C++ Flags
-SET(CMAKE_CXX_FLAGS "-std=c++11 -O3 -fPIC -DNDEBUG")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3 -fPIC -DNDEBUG")
 
 # XCode support
 IF("${CMAKE_GENERATOR}" MATCHES "Xcode")
@@ -35,10 +35,10 @@ IF("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
     ENDIF()
 
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -Wall")
-    
+
 ELSEIF("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wpedantic -Wextra -stdlib=libc++")
-    
+
 ELSE()
     MESSAGE(FATAL_ERROR "Unsupported compiler!")
 ENDIF()
